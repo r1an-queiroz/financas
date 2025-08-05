@@ -1,103 +1,211 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { useState } from "react"
+import { AddTransactionForm } from "@/components/add-transaction-form"
+import { TransactionList } from "@/components/transaction-list"
+import { FinancialSummary } from "@/components/financial-summary"
+import { ExpenseChart } from "@/components/expense-chart"
+import { DetailedReports } from "@/components/detailed-reports"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DollarSign, TrendingUp, TrendingDown, PieChart } from "lucide-react"
+
+export interface Transaction {
+  id: string
+  type: "income" | "expense"
+  amount: number
+  category: string
+  description: string
+  date: string
+}
+
+const initialTransactions: Transaction[] = [
+  {
+    id: "1",
+    type: "income",
+    amount: 5000,
+    category: "Salário",
+    description: "Salário mensal",
+    date: "2024-01-01",
+  },
+  {
+    id: "2",
+    type: "expense",
+    amount: 1200,
+    category: "Moradia",
+    description: "Aluguel",
+    date: "2024-01-02",
+  },
+  {
+    id: "3",
+    type: "expense",
+    amount: 300,
+    category: "Alimentação",
+    description: "Supermercado",
+    date: "2024-01-03",
+  },
+  {
+    id: "4",
+    type: "expense",
+    amount: 150,
+    category: "Transporte",
+    description: "Combustível",
+    date: "2024-01-04",
+  },
+]
+
+export default function FinanceManager() {
+  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions)
+
+  const addTransaction = (transaction: Omit<Transaction, "id">) => {
+    const newTransaction = {
+      ...transaction,
+      id: Date.now().toString(),
+    }
+    setTransactions([newTransaction, ...transactions])
+  }
+
+  const deleteTransaction = (id: string) => {
+    setTransactions(transactions.filter((t) => t.id !== id))
+  }
+
+  const totalIncome = transactions.filter((t) => t.type === "income").reduce((sum, t) => sum + t.amount, 0)
+
+  const totalExpenses = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + t.amount, 0)
+
+  const balance = totalIncome - totalExpenses
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold text-gray-900">Gerenciador Financeiro</h1>
+          <p className="text-gray-600">Controle suas finanças pessoais de forma simples e eficiente</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Financial Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Saldo Total</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${balance >= 0 ? "text-green-600" : "text-red-600"}`}>
+                R$ {balance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </div>
+              <p className="text-xs text-muted-foreground">{balance >= 0 ? "Saldo positivo" : "Saldo negativo"}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total de Receitas</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                R$ {totalIncome.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {transactions.filter((t) => t.type === "income").length} transações
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total de Despesas</CardTitle>
+              <TrendingDown className="h-4 w-4 text-red-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">
+                R$ {totalExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {transactions.filter((t) => t.type === "expense").length} transações
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content */}
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="transactions">Transações</TabsTrigger>
+            <TabsTrigger value="add">Adicionar</TabsTrigger>
+            <TabsTrigger value="analytics">Análises</TabsTrigger>
+            <TabsTrigger value="reports">Relatórios</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dashboard" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <FinancialSummary transactions={transactions} />
+              <ExpenseChart transactions={transactions} />
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Transações Recentes</CardTitle>
+                <CardDescription>Suas últimas 5 transações</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TransactionList
+                  transactions={transactions.slice(0, 5)}
+                  onDelete={deleteTransaction}
+                  showActions={false}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="transactions">
+            <Card>
+              <CardHeader>
+                <CardTitle>Todas as Transações</CardTitle>
+                <CardDescription>Gerencie todas as suas transações financeiras</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TransactionList transactions={transactions} onDelete={deleteTransaction} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="add">
+            <Card>
+              <CardHeader>
+                <CardTitle>Adicionar Transação</CardTitle>
+                <CardDescription>Registre uma nova receita ou despesa</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AddTransactionForm onAddTransaction={addTransaction} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ExpenseChart transactions={transactions} />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChart className="h-5 w-5" />
+                    Resumo por Categoria
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <FinancialSummary transactions={transactions} />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <DetailedReports transactions={transactions} />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
-  );
+  )
 }
